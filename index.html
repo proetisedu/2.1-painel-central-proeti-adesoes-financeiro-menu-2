@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROETI - Adesão / Financeiro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root{
+            --azul:#0f5f9f;
+            --azul-escuro:#082f49;
+            --azul-claro:#eaf4ff;
+            --cinza:#64748b;
+            --borda:#e2e8f0;
+            --bg:#f4f7fb;
+            --verde:#15803d;
+            --verde-bg:#dcfce7;
+            --vermelho:#b91c1c;
+            --vermelho-bg:#fee2e2;
+            --cinza-status:#475569;
+            --cinza-status-bg:#e2e8f0;
+        }
+
+        body{
+            background:var(--bg);
+            font-family:Segoe UI, Arial, sans-serif;
+            color:#1e293b;
+        }
+
+        .topo-proeti{
+            background:linear-gradient(135deg,var(--azul-escuro),var(--azul));
+            color:white;
+            padding:28px 24px;
+            box-shadow:0 4px 15px rgba(0,0,0,.15);
+        }
+
+        .titulo-proeti{
+            font-size:28px;
+            font-weight:800;
+            letter-spacing:.02em;
+            text-transform:uppercase;
+        }
+
+        .subtitulo-proeti{
+            opacity:.9;
+            font-size:14px;
+            margin-top:4px;
+        }
+
+        .btn-proeti{
+            background:rgba(255,255,255,.14);
+            border:1px solid rgba(255,255,255,.22);
+            color:white;
+            padding:10px 16px;
+            border-radius:12px;
+            font-size:13px;
+            font-weight:700;
+            transition:.2s;
+        }
+
+        .btn-proeti:hover{
+            background:rgba(255,255,255,.24);
+        }
+
+        .bloco{
+            background:white;
+            border:1px solid var(--borda);
+            border-radius:20px;
+            box-shadow:0 5px 15px rgba(0,0,0,.08);
+        }
+
+        .campo-filtro label{
+            display:block;
+            font-size:12px;
+            font-weight:800;
+            color:var(--azul-escuro);
+            margin-bottom:6px;
+            text-transform:uppercase;
+        }
+
+        .campo-filtro select{
+            width:100%;
+            padding:13px 14px;
+            border:1px solid var(--borda);
+            border-radius:12px;
+            color:var(--azul-escuro);
+            font-weight:600;
+            outline:none;
+            background:white;
+        }
+
+        .campo-filtro select:focus{
+            border-color:var(--azul);
+            box-shadow:0 0 0 3px rgba(15,95,159,.12);
+        }
+
+        .status-carregamento{
+            margin-bottom:18px;
+            padding:16px;
+            border-radius:14px;
+            background:#e0f2fe;
+            color:#075985;
+            font-weight:700;
+            border:1px solid #bae6fd;
+        }
+
+        .carregamento-topo{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            margin-bottom:10px;
+        }
+
+        .carregamento-texto{
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+
+        .carregamento-icone{
+            animation:girar 1s linear infinite;
+        }
+
+        .carregamento-percentual{
+            font-size:13px;
+            font-weight:900;
+            color:#0369a1;
+            min-width:42px;
+            text-align:right;
+        }
+
+        .barra-progresso{
+            width:100%;
+            height:10px;
+            background:#bae6fd;
+            border-radius:999px;
+            overflow:hidden;
+        }
+
+        .barra-progresso-preenchimento{
+            width:0%;
+            height:100%;
+            border-radius:999px;
+            background:linear-gradient(90deg,var(--azul),#38bdf8);
+            transition:width .35s ease;
+        }
+
+        @keyframes girar{
+            from{transform:rotate(0deg);}
+            to{transform:rotate(360deg);}
+        }
+
+        .status-erro{
+            margin-bottom:18px;
+            padding:12px 14px;
+            border-radius:12px;
+            background:#fee2e2;
+            color:#991b1b;
+            font-weight:700;
+        }
+
+        .orientacao{
+            background:white;
+            border:1px dashed #94a3b8;
+            border-radius:18px;
+            padding:34px 24px;
+            text-align:center;
+            color:var(--cinza);
+        }
+
+        .orientacao i{
+            color:var(--azul);
+            font-size:30px;
+            margin-bottom:12px;
+        }
+
+        .conteudo-municipio{
+            display:none;
+        }
+
+        .conteudo-municipio.ativo{
+            display:block;
+        }
+
+        .card-edocs{
+            border-left:5px solid var(--azul);
+            border-radius:16px;
+            box-shadow:0 5px 15px rgba(0,0,0,.08);
+            border-top:1px solid var(--borda);
+            border-right:1px solid var(--borda);
+            border-bottom:1px solid var(--borda);
+            min-height:126px;
+        }
+
+        .card-edocs h4{
+            color:var(--azul);
+        }
+
+        .titulo-secao{
+            color:var(--azul-escuro);
+            font-weight:900;
+            font-size:18px;
+            text-transform:uppercase;
+            display:flex;
+            align-items:center;
+            gap:10px;
+            margin-bottom:16px;
+        }
+
+        .card-total{
+            background:linear-gradient(135deg,var(--azul-escuro),var(--azul));
+            color:white;
+            border-radius:18px;
+            box-shadow:0 6px 18px rgba(8,47,73,.18);
+        }
+
+        .card-total .rotulo{
+            font-size:13px;
+            opacity:.82;
+            text-transform:uppercase;
+            font-weight:700;
+        }
+
+        .card-total .valor{
+            font-size:28px;
+            font-weight:900;
+            margin-top:6px;
+            white-space:nowrap;
+        }
+
+        .tabela-card{
+            border:1px solid var(--borda);
+            border-radius:16px;
+            box-shadow:0 5px 15px rgba(0,0,0,.08);
+            overflow:hidden;
+        }
+
+        .cabecalho-edital{
+            background:linear-gradient(135deg,var(--azul-escuro),var(--azul));
+            color:white;
+            padding:12px 16px;
+            font-weight:800;
+            font-size:14px;
+            text-transform:uppercase;
+            letter-spacing:.02em;
+        }
+
+        .badge{
+            display:inline-block;
+            padding:6px 10px;
+            border-radius:999px;
+            font-size:11px;
+            font-weight:900;
+            text-transform:uppercase;
+        }
+
+        .badge-ativo{
+            background:var(--verde-bg);
+            color:var(--verde);
+        }
+
+        .badge-desligado{
+            background:var(--vermelho-bg);
+            color:var(--vermelho);
+        }
+
+        .badge-nao-aderiu{
+            background:var(--cinza-status-bg);
+            color:var(--cinza-status);
+        }
+
+        .valor-atual-verde{
+            color:var(--verde);
+            font-weight:900;
+        }
+
+        .valor-atual-vermelho{
+            color:#ea580c;
+            font-weight:900;
+        }
+
+        .linha-total{
+            background:var(--azul-claro);
+            color:var(--azul-escuro);
+            font-weight:800;
+        }
+
+        .card-parcela{
+            border-top:5px solid var(--azul);
+            border-radius:16px;
+            box-shadow:0 5px 15px rgba(0,0,0,.08);
+            border-left:1px solid var(--borda);
+            border-right:1px solid var(--borda);
+            border-bottom:1px solid var(--borda);
+        }
+
+        .sem-registro{
+            color:var(--cinza);
+            font-style:italic;
+        }
+
+        footer{
+            background:var(--azul-escuro);
+            color:white;
+            text-align:center;
+            padding:25px;
+            margin-top:50px;
+        }
+
+        .dev{
+            margin-top:8px;
+            font-size:11px;
+            font-weight:400;
+            color:#93c5fd;
+            opacity:0.75;
+            letter-spacing:0.5px;
+        }
+
+        @media(max-width:768px){
+            .titulo-proeti{font-size:22px;}
+            .card-total .valor{font-size:22px;}
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="topo-proeti">
+    <div class="container mx-auto flex flex-col md:flex-row justify-between md:items-center gap-4">
+        <div>
+            <h1 class="titulo-proeti">Adesão / Financeiro</h1>
+            <p class="subtitulo-proeti">Painel de Adesões e Pactuação · PROETI</p>
+        </div>
+
+        <button onclick="carregarDados()" class="btn-proeti">
+            <i class="fas fa-rotate-right mr-2"></i>Atualizar dados
+        </button>
+    </div>
+</header>
+
+<main class="container mx-auto py-8 px-4">
+
+    <div id="mensagem-status" class="status-carregamento">
+        <div class="carregamento-topo">
+            <div class="carregamento-texto">
+                <i class="fas fa-spinner carregamento-icone"></i>
+                <span id="texto-carregamento">Carregando dados...</span>
+            </div>
+
+            <span id="percentual-carregamento" class="carregamento-percentual">0%</span>
+        </div>
+
+        <div class="barra-progresso">
+            <div id="barra-carregamento" class="barra-progresso-preenchimento"></div>
+        </div>
+    </div>
+
+    <section class="bloco p-6 mb-8">
+        <div class="campo-filtro max-w-xl">
+            <label>Selecione o município</label>
+            <select id="filtro-municipio" onchange="selecionarMunicipio()"></select>
+        </div>
+
+        <p class="text-xs text-gray-500 italic mt-3">
+            Os dados do município serão exibidos após a seleção.
+        </p>
+    </section>
+
+    <section id="orientacao-inicial" class="orientacao">
+        <i class="fas fa-city"></i>
+        <h2 class="font-bold text-lg text-slate-700">Selecione um município</h2>
+        <p class="mt-2">
+            Escolha um município no campo acima para consultar os processos E-Docs,
+            os dados cadastrais da adesão e os repasses financeiros por edital.
+        </p>
+    </section>
+
+    <div id="conteudo-municipio" class="conteudo-municipio">
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-5 card-edocs">
+                <span class="text-xs font-bold text-gray-400 uppercase">Processo E-Docs</span>
+                <h4 class="font-bold">Edital 001/2021</h4>
+                <p id="edocs-2021" class="text-lg font-mono mt-1 text-gray-700">Não informado</p>
+            </div>
+
+            <div class="bg-white p-5 card-edocs">
+                <span class="text-xs font-bold text-gray-400 uppercase">Processo E-Docs</span>
+                <h4 class="font-bold">Edital 001/2022</h4>
+                <p id="edocs-2022" class="text-lg font-mono mt-1 text-gray-700">Não informado</p>
+            </div>
+
+            <div class="bg-white p-5 card-edocs">
+                <span class="text-xs font-bold text-gray-400 uppercase">Processo E-Docs</span>
+                <h4 class="font-bold">Edital 001/2023</h4>
+                <p id="edocs-2023" class="text-lg font-mono mt-1 text-gray-700">Não informado</p>
+            </div>
+        </section>
+
+        <section class="card-total p-6 mb-10">
+            <div class="rotulo">Total recebido pelo município</div>
+            <div id="total-municipio" class="valor">R$ 0,00</div>
+        </section>
+
+        <h2 class="titulo-secao">
+            <i class="fas fa-id-card"></i>
+            Status de Adesão e Dados Cadastrais
+        </h2>
+
+        <section id="container-tabelas-adesao" class="space-y-8 mb-12"></section>
+
+        <h2 class="titulo-secao">
+            <i class="fas fa-hand-holding-dollar"></i>
+            Repasses Financeiros por Edital
+        </h2>
+
+        <section id="container-repasses" class="grid grid-cols-1 md:grid-cols-3 gap-6"></section>
+
+    </div>
+
+</main>
+
+<footer>
+    Sistema Gerencial PROETI | SEDU
+    <div class="dev">Sistema desenvolvido por Gledson Figueiredo</div>
+</footer>
+
+<script>
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbzPr4i9wUsZFh_0jM8f9fSGX21kdDwTKG20_0Lm3HbsTHv5oI6hEiLJu-6ze3n8nSQjew/exec";
+
+let dados = [];
+let dadosMunicipio = [];
+
+function normalizarTexto(valor){
+    return String(valor || "")
+        .trim()
+        .toUpperCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
+function normalizarEdital(valor){
+    const texto = normalizarTexto(valor);
+
+    if(texto.includes("2021")) return "001/2021";
+    if(texto.includes("2022")) return "001/2022";
+    if(texto.includes("2023")) return "001/2023";
+
+    return String(valor || "").trim();
+}
+
+function numero(valor){
+    if(typeof valor === "number") return valor;
+    if(!valor) return 0;
+
+    const texto = String(valor)
+        .replace(/[R$\s]/g, "")
+        .replace(/\./g, "")
+        .replace(",", ".");
+
+    return Number(texto) || 0;
+}
+
+function formatarNumero(valor){
+    return Number(valor || 0).toLocaleString("pt-BR");
+}
+
+function formatarMoeda(valor){
+    return Number(valor || 0).toLocaleString("pt-BR", {
+        style:"currency",
+        currency:"BRL"
+    });
+}
+
+function statusClasse(status){
+    const texto = normalizarTexto(status);
+
+    if(texto === "ATIVO") return "badge badge-ativo";
+    if(texto === "DESLIGADO") return "badge badge-desligado";
+
+    return "badge badge-nao-aderiu";
+}
+
+function statusExibicao(status){
+    const texto = normalizarTexto(status);
+
+    if(texto === "NAO ADERIU") return "Não aderiu";
+    if(texto === "DESLIGADO") return "Desligado";
+    if(texto === "ATIVO") return "Ativo";
+
+    return "Não informado";
+}
+
+function valorProcesso(registro){
+    if(!registro) return "Não informado";
+
+    if(normalizarTexto(registro.status) === "NAO ADERIU"){
+        return "Não se aplica";
+    }
+
+    return registro.processo || "Não informado";
+}
+
+let intervaloProgresso = null;
+let progressoAtual = 0;
+
+function atualizarProgresso(valor, texto){
+    progressoAtual = Math.max(0, Math.min(100, valor));
+
+    const barra = document.getElementById("barra-carregamento");
+    const percentual = document.getElementById("percentual-carregamento");
+    const mensagem = document.getElementById("texto-carregamento");
+
+    if(barra) barra.style.width = progressoAtual + "%";
+    if(percentual) percentual.textContent = Math.round(progressoAtual) + "%";
+    if(mensagem && texto) mensagem.textContent = texto;
+}
+
+function iniciarProgresso(){
+    clearInterval(intervaloProgresso);
+    progressoAtual = 0;
+
+    atualizarProgresso(4, "Conectando à planilha...");
+
+    intervaloProgresso = setInterval(() => {
+        let incremento = 0;
+
+        if(progressoAtual < 35){
+            incremento = Math.random() * 5 + 2;
+        }else if(progressoAtual < 65){
+            incremento = Math.random() * 3 + 1;
+        }else if(progressoAtual < 88){
+            incremento = Math.random() * 1.5 + 0.4;
+        }
+
+        if(progressoAtual < 88){
+            atualizarProgresso(
+                progressoAtual + incremento,
+                progressoAtual < 45
+                    ? "Carregando dados..."
+                    : "Processando informações..."
+            );
+        }
+    }, 260);
+}
+
+async function concluirProgresso(){
+    clearInterval(intervaloProgresso);
+
+    atualizarProgresso(92, "Atualizando o painel...");
+    await aguardar(180);
+
+    atualizarProgresso(100, "Dados carregados com sucesso.");
+    await aguardar(420);
+
+    document.getElementById("mensagem-status").style.display = "none";
+}
+
+function interromperProgresso(){
+    clearInterval(intervaloProgresso);
+}
+
+function aguardar(ms){
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function carregarDados(){
+    const mensagem = document.getElementById("mensagem-status");
+
+    mensagem.className = "status-carregamento";
+    mensagem.style.display = "block";
+
+    iniciarProgresso();
+    ocultarConteudo();
+
+    try{
+        if(URL_APPS_SCRIPT.includes("COLE_AQUI")){
+            throw new Error("A URL do Apps Script ainda não foi informada no HTML.");
+        }
+
+        const resposta = await fetch(URL_APPS_SCRIPT, { cache: "no-store" });
+        const retorno = await resposta.json();
+
+        if(!Array.isArray(retorno)){
+            throw new Error(
+                retorno.error ||
+                "O Apps Script não retornou uma lista de registros."
+            );
+        }
+
+        dados = retorno
+            .filter(item => item.municipio)
+            .map(item => ({
+                municipio:String(item.municipio || "").trim(),
+                edital:normalizarEdital(item.edital),
+                regional:String(item.regional || "").trim(),
+                status:String(item.status || "").trim(),
+                processo:String(item.processo || "").trim(),
+                executor:String(item.executor || "").trim(),
+                cnpj:String(item.cnpj || "").trim(),
+                agencia:String(item.agencia || "").trim(),
+                conta:String(item.conta || "").trim(),
+                vagasOfertadas:numero(item.vagasOfertadas),
+                vagasPactuadas:numero(item.vagasPactuadas),
+                mat2022:numero(item.mat2022),
+                mat2023:numero(item.mat2023),
+                mat2024:numero(item.mat2024),
+                mat2025:numero(item.mat2025),
+                mat2026:numero(item.mat2026),
+                parcela1:numero(item.parcela1),
+                parcela2:numero(item.parcela2),
+                parcela3:numero(item.parcela3),
+                parcela4:numero(item.parcela4),
+                totalRepasse:numero(item.totalRepasse)
+            }));
+
+        atualizarProgresso(90, "Organizando municípios...");
+        preencherMunicipios();
+
+        await concluirProgresso();
+
+    }catch(erro){
+        interromperProgresso();
+        mensagem.className = "status-erro";
+        mensagem.innerHTML = `
+            <i class="fas fa-triangle-exclamation mr-2"></i>
+            Erro ao carregar os dados: ${erro.message}
+        `;
+        console.error(erro);
+    }
+}
+
+function preencherMunicipios(){
+    const select = document.getElementById("filtro-municipio");
+
+    const municipios = [...new Set(
+        dados.map(item => item.municipio).filter(Boolean)
+    )].sort((a,b) => a.localeCompare(b, "pt-BR"));
+
+    select.innerHTML = `
+        <option value="">-- Escolha um município --</option>
+    `;
+
+    municipios.forEach(municipio => {
+        select.innerHTML += `
+            <option value="${municipio}">${municipio}</option>
+        `;
+    });
+}
+
+function selecionarMunicipio(){
+    const municipio = document.getElementById("filtro-municipio").value;
+
+    if(!municipio){
+        ocultarConteudo();
+        return;
+    }
+
+    dadosMunicipio = dados.filter(item => item.municipio === municipio);
+
+    document.getElementById("orientacao-inicial").style.display = "none";
+    document.getElementById("conteudo-municipio").classList.add("ativo");
+
+    atualizarPainel();
+}
+
+function ocultarConteudo(){
+    dadosMunicipio = [];
+
+    document.getElementById("conteudo-municipio").classList.remove("ativo");
+    document.getElementById("orientacao-inicial").style.display = "block";
+
+    document.getElementById("edocs-2021").textContent = "Não informado";
+    document.getElementById("edocs-2022").textContent = "Não informado";
+    document.getElementById("edocs-2023").textContent = "Não informado";
+    document.getElementById("total-municipio").textContent = "R$ 0,00";
+    document.getElementById("container-tabelas-adesao").innerHTML = "";
+    document.getElementById("container-repasses").innerHTML = "";
+}
+
+function atualizarPainel(){
+    atualizarProcessos();
+    atualizarTotalMunicipio();
+    atualizarDadosCadastrais();
+    atualizarRepasses();
+}
+
+function registroPorEdital(edital){
+    const editalNormalizado = normalizarEdital(edital);
+
+    return dadosMunicipio.find(
+        item => normalizarEdital(item.edital) === editalNormalizado
+    );
+}
+
+function atualizarProcessos(){
+    document.getElementById("edocs-2021").textContent =
+        valorProcesso(registroPorEdital("001/2021"));
+
+    document.getElementById("edocs-2022").textContent =
+        valorProcesso(registroPorEdital("001/2022"));
+
+    document.getElementById("edocs-2023").textContent =
+        valorProcesso(registroPorEdital("001/2023"));
+}
+
+function atualizarTotalMunicipio(){
+    const total = dadosMunicipio.reduce(
+        (soma,item) => soma + item.totalRepasse,
+        0
+    );
+
+    document.getElementById("total-municipio").textContent =
+        formatarMoeda(total);
+}
+
+function matriculaAtual(registro){
+    if(registro.mat2026 > 0) return {ano:2026, valor:registro.mat2026};
+    if(registro.mat2025 > 0) return {ano:2025, valor:registro.mat2025};
+    if(registro.mat2024 > 0) return {ano:2024, valor:registro.mat2024};
+    if(registro.mat2023 > 0) return {ano:2023, valor:registro.mat2023};
+    if(registro.mat2022 > 0) return {ano:2022, valor:registro.mat2022};
+
+    return {ano:"-", valor:0};
+}
+
+function atualizarDadosCadastrais(){
+    const container = document.getElementById("container-tabelas-adesao");
+
+    if(dadosMunicipio.length === 0){
+        container.innerHTML = `
+            <div class="bloco p-6 sem-registro">
+                Nenhum registro encontrado para o município selecionado.
+            </div>
+        `;
+        return;
+    }
+
+    const ordemEditais = {
+        "001/2021":1,
+        "001/2022":2,
+        "001/2023":3
+    };
+
+    const registrosOrdenados = [...dadosMunicipio].sort(
+        (a,b) => (ordemEditais[a.edital] || 99) - (ordemEditais[b.edital] || 99)
+    );
+
+    container.innerHTML = registrosOrdenados.map(registro => {
+        const atual = matriculaAtual(registro);
+
+        const classeAtual = atual.valor >= registro.vagasPactuadas
+            ? "valor-atual-verde"
+            : "valor-atual-vermelho";
+
+        return `
+            <div class="overflow-x-auto bg-white tabela-card">
+                <div class="cabecalho-edital">
+                    Edital ${registro.edital}
+                </div>
+
+                <table class="w-full text-left border-collapse">
+                    <tbody class="divide-y divide-gray-200">
+
+                        <tr>
+                            <td class="p-3 bg-gray-50 font-bold w-1/4">
+                                Status da Adesão
+                            </td>
+
+                            <td class="p-3">
+                                <span class="${statusClasse(registro.status)}">
+                                    ${statusExibicao(registro.status)}
+                                </span>
+                            </td>
+
+                            <td class="p-3 bg-gray-50 font-bold w-1/4">
+                                Regional
+                            </td>
+
+                            <td class="p-3">
+                                ${registro.regional || "Não informado"}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="p-3 bg-gray-50 font-bold">
+                                Executor
+                            </td>
+
+                            <td class="p-3">
+                                ${registro.executor || "Não informado"}
+                            </td>
+
+                            <td class="p-3 bg-gray-50 font-bold">
+                                CNPJ
+                            </td>
+
+                            <td class="p-3">
+                                ${registro.cnpj || "Não informado"}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="p-3 bg-gray-50 font-bold">
+                                Agência
+                            </td>
+
+                            <td class="p-3">
+                                ${registro.agencia || "Não informado"}
+                            </td>
+
+                            <td class="p-3 bg-gray-50 font-bold">
+                                Conta
+                            </td>
+
+                            <td class="p-3">
+                                ${registro.conta || "Não informado"}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="p-3 bg-gray-50 font-bold">
+                                Vagas Ofertadas
+                            </td>
+
+                            <td class="p-3 text-lg font-bold text-blue-600">
+                                ${formatarNumero(registro.vagasOfertadas)}
+                            </td>
+
+                            <td class="p-3 bg-gray-50 font-bold">
+                                Vagas Pactuadas
+                            </td>
+
+                            <td class="p-3 text-lg font-bold text-blue-600">
+                                ${formatarNumero(registro.vagasPactuadas)}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="p-3 bg-gray-50 font-bold">
+                                Matrículas ${atual.ano}
+                            </td>
+
+                            <td class="p-3 text-lg ${classeAtual}">
+                                ${formatarNumero(atual.valor)}
+                            </td>
+
+                            <td class="p-3 bg-gray-50 font-bold">
+                                Processo E-Docs
+                            </td>
+
+                            <td class="p-3 font-mono">
+                                ${valorProcesso(registro)}
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }).join("");
+}
+
+function atualizarRepasses(){
+    const container = document.getElementById("container-repasses");
+    const editais = ["001/2021","001/2022","001/2023"];
+
+    container.innerHTML = editais.map(edital => {
+        const registro = registroPorEdital(edital);
+
+        return `
+            <div class="bg-white card-parcela overflow-hidden">
+
+                <div class="p-3 bg-gray-50 font-bold text-center border-b">
+                    EDITAL ${edital}
+                </div>
+
+                <table class="w-full text-sm">
+
+                    <tr class="border-b">
+                        <td class="p-3">Parcela 1</td>
+                        <td class="p-3 text-right font-semibold">
+                            ${formatarMoeda(registro ? registro.parcela1 : 0)}
+                        </td>
+                    </tr>
+
+                    <tr class="border-b">
+                        <td class="p-3">Parcela 2</td>
+                        <td class="p-3 text-right font-semibold">
+                            ${formatarMoeda(registro ? registro.parcela2 : 0)}
+                        </td>
+                    </tr>
+
+                    <tr class="border-b">
+                        <td class="p-3">Parcela 3</td>
+                        <td class="p-3 text-right font-semibold">
+                            ${formatarMoeda(registro ? registro.parcela3 : 0)}
+                        </td>
+                    </tr>
+
+                    <tr class="border-b">
+                        <td class="p-3">Parcela 4</td>
+                        <td class="p-3 text-right font-semibold">
+                            ${formatarMoeda(registro ? registro.parcela4 : 0)}
+                        </td>
+                    </tr>
+
+                    <tr class="linha-total">
+                        <td class="p-3">TOTAL REPASSADO</td>
+                        <td class="p-3 text-right">
+                            ${formatarMoeda(registro ? registro.totalRepasse : 0)}
+                        </td>
+                    </tr>
+
+                </table>
+            </div>
+        `;
+    }).join("");
+}
+
+carregarDados();
+</script>
+
+</body>
+</html>
